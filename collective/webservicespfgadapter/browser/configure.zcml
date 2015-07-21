@@ -1,0 +1,16 @@
+<configure
+    xmlns:zope="http://namespaces.zope.org/zope"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    xmlns:borwser="http://namespaces.zope.org/browser">
+
+    <!--
+    <browser:page
+        for=""
+        name=""
+        class=""
+        permission=""
+        allowed_interface=""
+        />
+    -->
+
+</configure>
