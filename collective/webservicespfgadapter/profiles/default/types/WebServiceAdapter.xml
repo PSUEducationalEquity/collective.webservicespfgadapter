@@ -2,11 +2,11 @@
 <object name="FormWebServiceAdapter"
         meta_type="Factory-based Type Information with dynamic views"
         i18n:domain="plone" xmlns:i18n="http://xml.zope.org/namespaces/i18n">
-    <property name="title" i18n:translate="">Web Service Adapter"</property>
+    <property name="title" i18n:translate="">Web Service Adapter</property>
     <property name="description"
               i18n:translate=""
               >A form action adapter that submits input to a web service.</property>
-    <property name="content_icon">mailaction.gif</property>
+    <property name="content_icon"></property>
     <property name="content_meta_type">FormWebServiceAdapter</property>
     <property name="product">PloneFormGen</property>
     <property name="factory">addFormWebServiceAdapter</property>
