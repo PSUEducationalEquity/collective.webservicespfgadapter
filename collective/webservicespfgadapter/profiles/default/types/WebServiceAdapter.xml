@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<object name="Web Service Adapter"
+        meta_type="Factory-based Type Information with dynamic views"
+        i18n:domain="plone" xmlns:i18n="http://xml.zope.org/namespaces/i18n">
+    <property name="title" i18n:translate="">Web Service Adapter"</property>
+    <property name="description"
+              i18n:translate=""
+              >A form action adapter that submits input to a web service.</property>
+    <property name="content_icon">mailaction.gif</property>
+    <property name="content_meta_type">FormWebServiceAdapter</property>
+    <property name="product">PloneFormGen</property>
+    <property name="factory">addFormWebServiceAdapter</property>
+    <property name="immediate_view">base_view</property>
+    <property name="global_allow">False</property>
+    <property name="filter_content_types">False</property>
+    <property name="allowed_content_types" />
+    <property name="allow_discussion">False</property>
+    <property name="default_view">base_view</property>
+    <property name="view_methods">
+        <element name="base_view" />
+    </property>
+    <property name="default_view_fallback">False</property>
+    <alias from="(Default)" to="(dynamic view)" />
+    <alias from="edit" to="atct_edit" />
+    <alias from="view" to="(selected layout)" />
+    <action title="View" action_id="view" category="object" visible="True"
+            condition_expr=""
+            url_expr="string:${object_url}">
+        <permission value="View" />
+    </action>
+    <action title="Edit" action_id="edit" category="object" visible="True"
+            condition_expr="not:object/@@plone_lock_info/is_locked_for_current_user|python:True"
+            url_expr="string:${object_url}/edit">
+        <permission value="Modify portal content" />
+    </action>
+</object>
