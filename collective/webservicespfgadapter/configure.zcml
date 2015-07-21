@@ -1,0 +1,53 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    i18n_domain="collective.webservicespfgadapter">
+
+    <five:registerPackage package="." initialize=".initialize" />
+
+    <include package="Products.PloneFormGen"/>
+    <include package=".content" />
+    <include package=".browser"/>
+
+    <!-- Profiles -->
+    <genericsetup:registerProfile
+        name="default"
+        title="Web Services PloneFormGen Adapter"
+        directory="profiles/default"
+        description="Installs the Web Services PloneFormGen Adapter."
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+        />
+
+    <!-- Register the browser layer -->
+    <!--
+    <interface
+        interface=".interfaces.IThemeSpecific"
+        type="zope.publisher.interfaces.browser.IBrowserSkinType"
+        name="Web Services PloneFormGen Adapter" />
+    -->
+
+
+    <!-- Zope 3 browser resources -->
+    <!--
+    <browser:resourceDirectory
+        name="collective.webservicespfgadapter.images"
+        directory="images"
+        layer=".interfaces.IThemeSpecific" />
+
+    <browser:resourceDirectory
+        name="collective.webservicespfgadapter.javascript"
+        directory="javascript"
+        layer=".interfaces.IThemeSpecific" />
+
+    <browser:resourceDirectory
+        name="collective.webservicespfgadapter.stylesheets"
+        directory="stylesheets"
+        layer=".interfaces.IThemeSpecific" />
+    -->
+
+</configure>
+

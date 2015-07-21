@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<object name="portal_javascripts">
+
+    <!-- Example:
+    <javascript id="++resource++collective.webservicespfgadapter.javascript/yourfile.js"
+        cacheable="True" compression="none" cookable="True" enabled="True"
+        expression="" inline="False"/>
+    -->
+
+</object>
+
