@@ -35,20 +35,6 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
                 """,
             ),
         ),
-    BooleanField('showAll',
-        required=0,
-        searchable=0,
-        default='1',
-        read_permission=ModifyPortalContent,
-        widget=BooleanWidget(
-            label=u'Include All Fields',
-            description=u"""
-                Check this to include input for all fields (except label
-                fields). If you check this, the choices in the pick box below
-                will be ignored.
-                """,
-            ),
-        ),
     LinesField('showFields',
         required=0,
         searchable=0,
@@ -58,7 +44,7 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
             label=u'Include selected fields',
             description=u"""
                 Pick the fields whose inputs you would like to include in
-                the web service submission.
+                the web service submission. If empty, all fields will be sent.
                 """,
             ),
         ),
