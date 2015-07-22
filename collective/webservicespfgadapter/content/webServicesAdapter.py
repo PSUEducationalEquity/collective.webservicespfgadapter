@@ -16,8 +16,11 @@ from Products.CMFCore.permissions import View, ModifyPortalContent
 
 from Products.PloneFormGen.config import *
 from Products.PloneFormGen.content.actionAdapter import FormActionAdapter, FormAdapterSchema
+from Products.PloneFormGen.interfaces import IPloneFormGenForm
 
 from Products.TemplateFields import ZPTField as ZPTField
+
+from types import StringTypes
 
 
 formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
@@ -107,10 +110,46 @@ class FormWebServiceAdapter(FormActionAdapter):
         return super(FormWebServiceAdapter, self).__bobo_traverse__(REQUEST, name)
 
 
+    security.declarePrivate('_getParentForm')
+    def _getParentForm(self):
+        """ Gets the IPloneFormGenForm parent of this object. """
+        parent = self.aq_parent
+        while not IPloneFormGenForm.providedBy(parent):
+            try:
+                parent = parent.aq_parent
+            except AttributeError:
+                parent = None
+                break;
+        return parent
+
+
     security.declareProtected(View, 'onSuccess')
     def onSuccess(self, fields, REQUEST=None):
         """ Submits the data to the web service. """
-        print "Hello World!"
+        data = {}
+        for f in fields:
+            showFields = getattr(self, 'showFields', [])
+            if showFields and f.id not in showFields:
+                continue
+            if not f.isLabel():
+                val = REQUEST.form.get(f.fgField.getName(), '')
+                if not type(val) in StringTypes:
+                    # Zope has marshalled the field into
+                    # something other than a string
+                    val = str(val)
+                data[f.title] = val
+
+        if self.info_headers:
+            for f in self.info_headers:
+                data[f] = getattr(REQUEST, f, '')
+
+        pfg = self._getParentForm()
+        submission = {
+            'id': pfg.id,
+            'title': pfg.title,
+            'owner': pfg.getOwner().getUserName(),
+            'data': data,
+            }
 
 
     security.declareProtected(View, 'allFieldDisplayList')
@@ -123,7 +162,6 @@ class FormWebServiceAdapter(FormActionAdapter):
     def setShowFields(self, value, **kwargs):
         """ Reorder form inputs to match field order. """
         # This wouldn't be necessary if the PickWidget retained order.
-
         self.showFields = []
         for field in self.fgFields(excludeServerSide=False):
             id = field.getName()
