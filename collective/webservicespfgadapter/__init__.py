@@ -14,6 +14,7 @@ from Products.CMFCore import utils
 
 from collective.webservicespfgadapter.config import PROJECT_NAME, \
     WSA_ADD_CONTENT_PERMISSION
+from Products.PloneFormGen.config import ADD_CONTENT_PERMISSION
 
 
 def initialize(context):
@@ -27,10 +28,14 @@ def initialize(context):
     allTypes = zip(content_types, constructors)
     for atype, constructor in allTypes:
         kind = "%s: %s" % (PROJECT_NAME, atype.archetype_name)
+        if atype.portal_type == 'SalesforcePFGAdapter':
+            permission = SFA_ADD_CONTENT_PERMISSION
+        else:
+            permission = ADD_CONTENT_PERMISSION
         utils.ContentInit(
             kind,
             content_types      = (atype, ),
-            permission         = WSA_ADD_CONTENT_PERMISSION,
+            permission         = permission,
             extra_constructors = (constructor, ),
             fti                = ftis,
             ).initialize(context)
