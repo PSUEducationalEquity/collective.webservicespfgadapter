@@ -19,6 +19,7 @@ from Products.PloneFormGen.config import ADD_CONTENT_PERMISSION
 
 def initialize(context):
     """ Initializer called when used as a Zope 2 product. """
+    import pdb; pdb.set_trace()
     import content
 
     content_types, constructors, ftis = process_types(
