@@ -18,6 +18,8 @@ from Products.PloneFormGen.config import *
 from Products.PloneFormGen.content.actionAdapter import FormActionAdapter, FormAdapterSchema
 from Products.PloneFormGen.interfaces import IPloneFormGenForm
 
+from collective.webservicespfgadapter.config import extra_data
+
 from Products.TemplateFields import ZPTField as ZPTField
 
 from types import StringTypes
@@ -51,24 +53,16 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
                 """,
             ),
         ),
-    LinesField('info_headers',
+    LinesField('extraData',
         required=0,
         searchable=0,
         read_permission=ModifyPortalContent,
-        vocabulary=DisplayList((
-            ('REMOTE_ADDR', 'IP address of the user who completed the form', ),
-            ('REMOTE_USER', 'Logged in user (when applicable)', ),
-            ('REMOTE_REALM', 'Domain of the logged in user (when applicable)', ),
-            ('PATH_INFO', 'PATH_INFO', ),
-            ('HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED_FOR', ),
-            ('HTTP_USER_AGENT', "Description of the user's browser", ),
-            ('HTTP_REFERER', 'Web page the user visited before filling out the form', ),
-            ), ),
+        vocabulary='extraDataDisplayList',
         widget=MultiSelectionWidget(
-            label=u'HTTP Headers',
+            label=u'Extra Data',
             description=u"""
-                Select any items from the HTTP headers that you would like
-                included with the form submission data.
+                Pick any extra data you would like included with the
+                web service submission.
                 """,
             format='checkbox',
             ),
@@ -110,6 +104,15 @@ class FormWebServiceAdapter(FormActionAdapter):
         return super(FormWebServiceAdapter, self).__bobo_traverse__(REQUEST, name)
 
 
+    security.declareProtected(View, 'extraDataDisplayList')
+    def extraDataDisplayList(self):
+        """ returns a DisplayList of the extra data options """
+        dl = DisplayList()
+        for key, value in extra_data.iteritems():
+            dl.add(key, value)
+        return dl
+
+
     security.declarePrivate('_getParentForm')
     def _getParentForm(self):
         """ Gets the IPloneFormGenForm parent of this object. """
@@ -139,9 +142,9 @@ class FormWebServiceAdapter(FormActionAdapter):
                     val = str(val)
                 data[f.title] = val
 
-        if self.info_headers:
-            for f in self.info_headers:
-                data[f] = getattr(REQUEST, f, '')
+        if self.extraData:
+            for f in self.extraData:
+                data[extra_data[f]] = getattr(REQUEST, f, '')
 
         pfg = self._getParentForm()
         submission = {
