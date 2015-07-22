@@ -8,7 +8,7 @@
               >A form action adapter that sends the form submission to a web service.</property>
     <property name="content_icon">FormAction.gif</property>
     <property name="content_meta_type">FormWebServiceAdapter</property>
-    <property name="product">WebServicesPFGAdapter</property>
+    <property name="product">collective.webservicespfgadapter</property>
     <property name="factory">addFormWebServiceAdapter</property>
     <property name="immediate_view">base_view</property>
     <property name="global_allow">False</property>
