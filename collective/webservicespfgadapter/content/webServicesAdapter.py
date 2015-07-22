@@ -8,6 +8,8 @@ __docformat__ = 'plaintext'
 
 from AccessControl import ClassSecurityInfo
 
+from Products.Archetypes.atapi import *
+
 from Products.ATContentTypes.content.base import registerATCT
 
 from Products.CMFCore.permissions import View, ModifyPortalContent
