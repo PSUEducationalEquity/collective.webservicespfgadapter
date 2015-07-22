@@ -19,7 +19,6 @@ from Products.PloneFormGen.config import ADD_CONTENT_PERMISSION
 
 def initialize(context):
     """ Initializer called when used as a Zope 2 product. """
-    import pdb; pdb.set_trace()
     import content
 
     content_types, constructors, ftis = process_types(
@@ -29,8 +28,8 @@ def initialize(context):
     allTypes = zip(content_types, constructors)
     for atype, constructor in allTypes:
         kind = "%s: %s" % (PROJECT_NAME, atype.archetype_name)
-        if atype.portal_type == 'SalesforcePFGAdapter':
-            permission = SFA_ADD_CONTENT_PERMISSION
+        if atype.portal_type == 'WebServicePFGAdapter':
+            permission = WSA_ADD_CONTENT_PERMISSION
         else:
             permission = ADD_CONTENT_PERMISSION
         utils.ContentInit(
