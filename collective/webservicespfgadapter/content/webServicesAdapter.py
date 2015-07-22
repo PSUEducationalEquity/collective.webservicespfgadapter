@@ -110,7 +110,7 @@ class FormWebServiceAdapter(FormActionAdapter):
     schema = formWebServiceAdapterSchema
     portal_type = meta_type = 'FormWebServiceAdapter'
     archetype_name = 'Web Service Adapter'
-    #content_icon = 'action.gif'
+    content_icon = 'FormAction.gif'
 
     security = ClassSecurityInfo()
 
