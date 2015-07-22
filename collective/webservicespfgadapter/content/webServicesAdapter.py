@@ -40,7 +40,7 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
         searchable=0,
         default='1',
         read_permission=ModifyPortalContent,
-        widget=BooleanField(
+        widget=BooleanWidget(
             label=u'Include All Fields',
             description=u"""
                 Check this to include input for all fields (except label
