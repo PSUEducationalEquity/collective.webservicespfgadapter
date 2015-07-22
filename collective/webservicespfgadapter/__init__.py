@@ -28,7 +28,7 @@ def initialize(context):
     allTypes = zip(content_types, constructors)
     for atype, constructor in allTypes:
         kind = "%s: %s" % (PROJECT_NAME, atype.archetype_name)
-        if atype.portal_type == 'WebServicePFGAdapter':
+        if atype.portal_type == 'FormWebServiceAdapter':
             permission = WSA_ADD_CONTENT_PERMISSION
         else:
             permission = ADD_CONTENT_PERMISSION
