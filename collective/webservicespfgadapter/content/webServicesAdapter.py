@@ -53,7 +53,7 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
         searchable=0,
         read_permission=ModifyPortalContent,
         vocabulary=DisplayList((
-            ('REMOTE_ADDR', 'IP addres of the user who completed the form', ),
+            ('REMOTE_ADDR', 'IP address of the user who completed the form', ),
             ('REMOTE_USER', 'Logged in user (when applicable)', ),
             ('REMOTE_REALM', 'Domain of the logged in user (when applicable)', ),
             ('PATH_INFO', 'PATH_INFO', ),
