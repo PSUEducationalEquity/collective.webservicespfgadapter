@@ -121,10 +121,10 @@ class FormWebServiceAdapter(FormActionAdapter):
         return super(FormWebServiceAdapter, self).__bobo_traverse__(REQUEST, name)
 
 
-    security.declarePrivate('onSuccess')
+    security.declareProtected(View, 'onSuccess')
     def onSuccess(self, fields, REQUEST=None):
         """ Submits the data to the web service. """
-        import pdb; pdb.set_trace()
+        print "Hello World!"
 
 
     security.declareProtected(View, 'allFieldDisplayList')
