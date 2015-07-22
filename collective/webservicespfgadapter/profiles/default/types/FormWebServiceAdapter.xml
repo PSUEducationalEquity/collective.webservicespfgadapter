@@ -5,7 +5,7 @@
     <property name="title" i18n:translate="">Web Service Adapter</property>
     <property name="description"
               i18n:translate=""
-              >A form action adapter that submits input to a web service.</property>
+              >A form action adapter that sends the form submission to a web service.</property>
     <property name="content_icon">FormAction.gif</property>
     <property name="content_meta_type">FormWebServiceAdapter</property>
     <property name="product">WebServicesPFGAdapter</property>

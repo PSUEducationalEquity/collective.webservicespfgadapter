@@ -1,5 +1,5 @@
 """
-A form action adapter that submits input to a web service.
+A form action adapter that sends the form submission to a web service.
 """
 
 __author__ = 'Paul Rentschler <par117@psu.edu>'
@@ -105,7 +105,7 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
 
 
 class FormWebServiceAdapter(FormActionAdapter):
-    """ A form action adapter that submits input to a web service. """
+    """ A form action adapter that sends the form submission to a web service. """
 
     schema = formWebServiceAdapterSchema
     portal_type = meta_type = 'FormWebServiceAdapter'
