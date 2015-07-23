@@ -24,7 +24,7 @@ from Products.TemplateFields import ZPTField as ZPTField
 
 from types import StringTypes
 
-import json
+import json, requests
 
 
 formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
@@ -156,7 +156,19 @@ class FormWebServiceAdapter(FormActionAdapter):
             'owner': pfg.getOwner().getUserName(),
             'data': json.dumps(data),
             }
-        print submission
+        try:
+            response = requests.post(
+                self.url,
+                data=submission,
+                timeout=1.5
+                )
+        except requests.exceptions.ConnectionError:
+            print "Ugh! Server's down :("
+        except requests.exceptions.Timeout:
+            print "Gitty Up! Crack the whip on the server."
+        else:
+            if response.status_code != 201:
+                print "Ack! something went horribly wrong!"
 
 
     security.declareProtected(View, 'allFieldDisplayList')
