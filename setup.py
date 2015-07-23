@@ -28,6 +28,7 @@ setup(name='collective.webservicespfgadapter',
           'setuptools',
           'Products.PloneFormGen>=1.7.0',
           'Products.TALESField',
+          'requests',
       ],
       entry_points="""
       # -*- Entry points: -*-
