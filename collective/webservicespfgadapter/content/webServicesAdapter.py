@@ -153,7 +153,7 @@ class FormWebServiceAdapter(FormActionAdapter):
             'form-id': pfg.id,
             'name': pfg.title,
             'url': pfg.absolute_url(),
-            'owner': pfg.getOwner().getUserName(),
+            'owner': pfg.Creator(),
             'data': json.dumps(data),
             }
         try:
