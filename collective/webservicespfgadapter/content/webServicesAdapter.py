@@ -24,6 +24,8 @@ from Products.TemplateFields import ZPTField as ZPTField
 
 from types import StringTypes
 
+import json
+
 
 formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
     StringField('url',
@@ -148,11 +150,13 @@ class FormWebServiceAdapter(FormActionAdapter):
 
         pfg = self._getParentForm()
         submission = {
-            'id': pfg.id,
-            'title': pfg.title,
+            'form-id': pfg.id,
+            'name': pfg.title,
+            'url': pfg.absolute_url(),
             'owner': pfg.getOwner().getUserName(),
-            'data': data,
+            'data': json.dumps(data),
             }
+        print submission
 
 
     security.declareProtected(View, 'allFieldDisplayList')
