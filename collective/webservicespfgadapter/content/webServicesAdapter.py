@@ -86,7 +86,7 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
                 service all warnings and error messages WILL BE SUPPRESSED.
                 ONLY enable this option if you have configured another action
                 adapter, otherwise the form data WILL BE LOST!
-                """),
+                """,
             ),
         ),
     BooleanField('storeFailedSubmissions',
@@ -102,7 +102,7 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
                 service, the entire submission will be stored in this action
                 adapter for later retrieval and an email will be sent to the
                 address listed in 'Notify on failure'.
-                """),
+                """,
             ),
         ),
     StringField('notifyOnFailure',
@@ -116,7 +116,7 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
                 Comma separated list of email addresses that will be notified
                 if an error occurs while submitting the form data to the web
                 service.
-                """),
+                """,
             ),
         ),
     BooleanField('runDisabledAdapters',
@@ -133,7 +133,7 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
                 This allows you to setup other action adapters (e.g. Save
                 Data Adapter) that are ONLY run when an error occurs while
                 submitting to the web service.
-                """),
+                """,
             ),
         ),
     LinesField('failedSubmissions',
@@ -150,7 +150,7 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
                 The submissions are stored one per line in JSON format
                 unless an encryption key is present, then they are stored
                 one per line with carriage returns replaced by pipes (|).
-                """),
+                """,
             ),
         ),
 ))
