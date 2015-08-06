@@ -14,9 +14,9 @@
     <!-- Profiles -->
     <genericsetup:registerProfile
         name="default"
-        title="Web Services PloneFormGen Adapter"
+        title="PloneFormGen Web Services Adapter"
         directory="profiles/default"
-        description="Installs the Web Services PloneFormGen Adapter."
+        description="Installs the PloneFormGen Web Services Adapter."
         provides="Products.GenericSetup.interfaces.EXTENSION"
         for="Products.CMFPlone.interfaces.IPloneSiteRoot"
         />
