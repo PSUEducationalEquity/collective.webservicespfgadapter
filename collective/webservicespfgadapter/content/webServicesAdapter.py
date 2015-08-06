@@ -83,7 +83,7 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
             label=u'Fail silently',
             description=u"""
                 If an error occurs while submitting the data to the web
-                service all warnings and error messages WILL BE SUPPRESSED.
+                service all warnings and error messages will be suppressed.
                 ONLY enable this option if you have configured another action
                 adapter, otherwise the form data WILL BE LOST!
                 """,
@@ -100,8 +100,7 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
             description=u"""
                 If an error occurs while submitting the form data to the web
                 service, the entire submission will be stored in this action
-                adapter for later retrieval and an email will be sent to the
-                address listed in 'Notify on failure'.
+                adapter for later retrieval.
                 """,
             ),
         ),
@@ -129,7 +128,8 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
             label=u'Run disabled adapters',
             description=u"""
                 If an error occurs while submitting the form data to the web
-                service, should any disabled action adapters be run?
+                service and 'Fail Silently' is checked, should the disabled
+                action adapters be run?
                 This allows you to setup other action adapters (e.g. Save
                 Data Adapter) that are ONLY run when an error occurs while
                 submitting to the web service.
