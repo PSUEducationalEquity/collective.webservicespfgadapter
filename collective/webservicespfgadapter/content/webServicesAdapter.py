@@ -280,11 +280,14 @@ class FormWebServiceAdapter(FormActionAdapter):
         try:
             self._onSuccess(fields, REQUEST)
         except:
-            # swallow the exception, but log it
-            t, v = sys.exc_info()[:2]
-            logger.exception('Unable to save form data to web service. (%s)' % '/'.join(self.getPhysicalPath()))
-
             if not self.failSilently:
+                raise
+
+            else:
+                # swallow the exception, but log it
+                t, v = sys.exc_info()[:2]
+                logger.exception('Unable to save form data to web service. (%s)' % '/'.join(self.getPhysicalPath()))
+
                 formFolder = aq_parent(self)
                 enabled_adapters = formFolder.getActionAdapter()
                 adapters = [o for o in formFolder.objectValues() if IPloneFormGenActionAdapter.providedBy(o)]
@@ -305,6 +308,7 @@ class FormWebServiceAdapter(FormActionAdapter):
                         formFolder.absolute_url()
                         )
 
+                # add a list of where the data was stored to the email message
                 for adapter in active_savedata:
                     message += "  - Save Data Adapter (%s)\n" % (adapter.absolute_url())
 
