@@ -7,23 +7,28 @@ __docformat__ = 'plaintext'
 
 
 from AccessControl import ClassSecurityInfo
+from Acquisition import aq_parent
 
 from Products.Archetypes.atapi import *
-
 from Products.ATContentTypes.content.base import registerATCT
-
 from Products.CMFCore.permissions import View, ModifyPortalContent
+from Products.CMFCore.utils import getToolByName
 
 from Products.PloneFormGen.config import *
-from Products.PloneFormGen.content.actionAdapter import FormActionAdapter, FormAdapterSchema
-from Products.PloneFormGen.interfaces import IPloneFormGenForm
+from Products.PloneFormGen.content.actionAdapter import \
+    FormActionAdapter, FormAdapterSchema
+from Products.PloneFormGen.content.formMailerAdapter import FormMailerAdapter
+from Products.PloneFormGen.content.saveDataAdapter import FormSaveDataAdapter
+from Products.PloneFormGen.interfaces import IPloneFormGenForm, IPloneFormGenActionAdapter
 
-from collective.webservicespfgadapter.config import extra_data
+from collective.webservicespfgadapter.config import *
 
 from types import StringTypes
 
-import json, requests
+import json, logging, requests, sys, traceback
 
+
+logger = logging.getLogger("PloneFormGen")
 
 formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
     StringField('url',
@@ -219,9 +224,10 @@ class FormWebServiceAdapter(FormActionAdapter):
         return parent
 
 
-    security.declareProtected(View, 'onSuccess')
-    def onSuccess(self, fields, REQUEST=None):
-        """ Submits the data to the web service. """
+    def _onSuccess(self, fields, REQUEST=None):
+        """
+        Submits the form data to the web service.
+        """
         data = {}
         for f in fields:
             showFields = getattr(self, 'showFields', [])
@@ -253,13 +259,90 @@ class FormWebServiceAdapter(FormActionAdapter):
                 data=submission,
                 timeout=1.5
                 )
-        except requests.exceptions.ConnectionError:
-            print "Ugh! Server's down :("
-        except requests.exceptions.Timeout:
-            print "Gitty Up! Crack the whip on the server."
+        except:
+            raise
         else:
             if response.status_code != 201:
-                print "Ack! something went horribly wrong!"
+                msg = "Web service submission failed by returning status " \
+                    + "code: %s. Was expecting status code 201." % response.status_code
+                raise Exception(msg)
+
+
+    security.declareProtected(View, 'onSuccess')
+    def onSuccess(self, fields, REQUEST=None):
+        """
+        Wrap _onSuccess so fallback behavior can be implemented when calls
+        to the web service fail.
+        """
+        # heavily borrowed from: https://plone.org/products/salesforcepfgadapter
+
+        message = None
+        try:
+            self._onSuccess(fields, REQUEST)
+        except:
+            # swallow the exception, but log it
+            t, v = sys.exc_info()[:2]
+            logger.exception('Unable to save form data to web service. (%s)' % '/'.join(self.getPhysicalPath()))
+
+            formFolder = aq_parent(self)
+            enabled_adapters = formFolder.getActionAdapter()
+            adapters = [o for o in formFolder.objectValues() if IPloneFormGenActionAdapter.providedBy(o)]
+            active_savedata = [o for o in adapters if isinstance(o, FormSaveDataAdapter)
+                                                   and o in enabled_adapters]
+            inactive_savedata = [o for o in adapters if isinstance(o, FormSaveDataAdapter)
+                                                     and o not in enabled_adapters]
+            active_mailer = [o for o in adapters if isinstance(o, FormMailerAdapter)
+                                                 and o in enabled_adapters]
+            inactive_mailer = [o for o in adapters if isinstance(o, FormMailerAdapter)
+                                                   and o not in enabled_adapters]
+
+            # start the failure email message
+            message = "Someone submitted this form (%s), but the data " \
+                + "couldn't be saved to the web service due to an exception." \
+                + "\n\n" \
+                + "The data was saved in the following locations:\n" % (
+                    formFolder.absolute_url()
+                    )
+
+            for adapter in active_savedata:
+                message += "  - Save Data Adapter (%s)\n" % (adapter.absolute_url())
+
+            for adapter in inactive_savedata:
+                message += "  - Save Data Adapter (%s)\n" % (adapter.absolute_url())
+                # Trigger the adapter since it's disabled.
+                # This can be used to record data *only* when submitting to
+                #   the web service fails.
+                adapter.onSuccess(fields, REQUEST)
+
+            for adapter in active_mailer:
+                message += "  - Mailer Adapter (%s)\n" % (adapter.absolute_url())
+
+            for adapter in inactive_mailer:
+                message += "  - Mailer Adapter (%s)\n" % (adapter.absolute_url())
+                # Trigger the adapter since it's disabled.
+                # This can be used to record data *only* when submitting to
+                #   the web service fails.
+                adapter.onSuccess(fields, REQUEST)
+
+            if not active_savedata and not inactive_savedata and \
+               not active_mailer and not inactive_mailer:
+                message += "  - NO WHERE!\n"
+
+            message += "\nTechnical details on the exception:\n"
+            message += ''.join(traceback.format_exception_only(t, v))
+
+            if self.notifyOnFailure:
+                mailer = getToolByName(context, 'MailHost')
+                mailer.send(
+                    message,
+                    mto=self.notifyOnFailure,
+                    mfrom=None,
+                    subject='Form submission to web service failed',
+                    encode=None,
+                    immediate=False,
+                    charset='utf8',
+                    msg_type='type/plain'
+                    )
 
 
     security.declareProtected(ModifyPortalContent, 'setShowFields')
