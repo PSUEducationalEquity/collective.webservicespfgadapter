@@ -177,6 +177,13 @@ class FormWebServiceAdapter(FormActionAdapter):
 
     security = ClassSecurityInfo()
 
+    security.declareProtected(View, 'allFieldDisplayList')
+
+    def allFieldDisplayList(self):
+        """ returns a DisplayList of all fields """
+        return self.fgFieldsDisplayList()
+
+
     def __bobo_traverse__(self, REQUEST, name):
         # prevent traversal to attributes we want to protect
         if name == 'submission_pt':
@@ -247,12 +254,6 @@ class FormWebServiceAdapter(FormActionAdapter):
         else:
             if response.status_code != 201:
                 print "Ack! something went horribly wrong!"
-
-
-    security.declareProtected(View, 'allFieldDisplayList')
-    def allFieldDisplayList(self):
-        """ returns a DisplayList of all fields """
-        return self.fgFieldsDisplayList()
 
 
     security.declareProtected(ModifyPortalContent, 'setShowFields')
