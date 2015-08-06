@@ -284,65 +284,75 @@ class FormWebServiceAdapter(FormActionAdapter):
             t, v = sys.exc_info()[:2]
             logger.exception('Unable to save form data to web service. (%s)' % '/'.join(self.getPhysicalPath()))
 
-            formFolder = aq_parent(self)
-            enabled_adapters = formFolder.getActionAdapter()
-            adapters = [o for o in formFolder.objectValues() if IPloneFormGenActionAdapter.providedBy(o)]
-            active_savedata = [o for o in adapters if isinstance(o, FormSaveDataAdapter)
-                                                   and o in enabled_adapters]
-            inactive_savedata = [o for o in adapters if isinstance(o, FormSaveDataAdapter)
-                                                     and o not in enabled_adapters]
-            active_mailer = [o for o in adapters if isinstance(o, FormMailerAdapter)
-                                                 and o in enabled_adapters]
-            inactive_mailer = [o for o in adapters if isinstance(o, FormMailerAdapter)
-                                                   and o not in enabled_adapters]
+            if not self.failSilently:
+                formFolder = aq_parent(self)
+                enabled_adapters = formFolder.getActionAdapter()
+                adapters = [o for o in formFolder.objectValues() if IPloneFormGenActionAdapter.providedBy(o)]
+                active_savedata = [o for o in adapters if isinstance(o, FormSaveDataAdapter)
+                                                       and o in enabled_adapters]
+                inactive_savedata = [o for o in adapters if isinstance(o, FormSaveDataAdapter)
+                                                         and o not in enabled_adapters]
+                active_mailer = [o for o in adapters if isinstance(o, FormMailerAdapter)
+                                                     and o in enabled_adapters]
+                inactive_mailer = [o for o in adapters if isinstance(o, FormMailerAdapter)
+                                                       and o not in enabled_adapters]
 
-            # start the failure email message
-            message = "Someone submitted this form (%s), but the data " \
-                + "couldn't be saved to the web service due to an exception." \
-                + "\n\n" \
-                + "The data was saved in the following locations:\n" % (
-                    formFolder.absolute_url()
-                    )
+                # start the failure email message
+                message = "Someone submitted this form (%s), but the data " \
+                    + "couldn't be saved to the web service due to an exception." \
+                    + "\n\n" \
+                    + "The data was saved in the following locations:\n" % (
+                        formFolder.absolute_url()
+                        )
 
-            for adapter in active_savedata:
-                message += "  - Save Data Adapter (%s)\n" % (adapter.absolute_url())
+                for adapter in active_savedata:
+                    message += "  - Save Data Adapter (%s)\n" % (adapter.absolute_url())
 
-            for adapter in inactive_savedata:
-                message += "  - Save Data Adapter (%s)\n" % (adapter.absolute_url())
-                # Trigger the adapter since it's disabled.
-                # This can be used to record data *only* when submitting to
-                #   the web service fails.
-                adapter.onSuccess(fields, REQUEST)
+                if self.runDisabledAdapters:
+                    for adapter in inactive_savedata:
+                        message += "  - Save Data Adapter (%s)\n" % (adapter.absolute_url())
+                        # Trigger the adapter since it's disabled.
+                        # This can be used to record data *only* when submitting to
+                        #   the web service fails.
+                        adapter.onSuccess(fields, REQUEST)
 
-            for adapter in active_mailer:
-                message += "  - Mailer Adapter (%s)\n" % (adapter.absolute_url())
+                for adapter in active_mailer:
+                    message += "  - Mailer Adapter (%s)\n" % (adapter.absolute_url())
 
-            for adapter in inactive_mailer:
-                message += "  - Mailer Adapter (%s)\n" % (adapter.absolute_url())
-                # Trigger the adapter since it's disabled.
-                # This can be used to record data *only* when submitting to
-                #   the web service fails.
-                adapter.onSuccess(fields, REQUEST)
+                if self.runDisabledAdapters:
+                    for adapter in inactive_mailer:
+                        message += "  - Mailer Adapter (%s)\n" % (adapter.absolute_url())
+                        # Trigger the adapter since it's disabled.
+                        # This can be used to record data *only* when submitting to
+                        #   the web service fails.
+                        adapter.onSuccess(fields, REQUEST)
 
-            if not active_savedata and not inactive_savedata and \
-               not active_mailer and not inactive_mailer:
-                message += "  - NO WHERE!\n"
+                if self.storeFailedSubmissions:
+                    ### TODO: store the submission data in JSON format in
+                    #         self.failedSubmissions
+                    message += "  - Locally [coming soon] (%s)\n" % (self.absolute_url())
 
-            message += "\nTechnical details on the exception:\n"
-            message += ''.join(traceback.format_exception_only(t, v))
+                if not active_savedata and not inactive_savedata and \
+                   not active_mailer and not inactive_mailer and \
+                   not self.storeFailedSubmissions:
+                    message += "  - NO WHERE! The data was lost.\n"
 
-            if self.notifyOnFailure:
-                mailer = getToolByName(context, 'MailHost')
-                mailer.send(
-                    message,
-                    mto=self.notifyOnFailure,
-                    mfrom=None,
-                    subject='Form submission to web service failed',
-                    encode=None,
-                    immediate=False,
-                    charset='utf8',
-                    msg_type='type/plain'
-                    )
+
+                message += "\nTechnical details on the exception:\n"
+                message += ''.join(traceback.format_exception_only(t, v))
+
+                if self.notifyOnFailure:
+                    mailer = getToolByName(context, 'MailHost')
+                    mailer.send(
+                        message,
+                        mto=self.notifyOnFailure,
+                        mfrom=None,
+                        subject='Form submission to web service failed',
+                        encode=None,
+                        immediate=False,
+                        charset='utf8',
+                        msg_type='type/plain'
+                        )
 
 
     security.declareProtected(ModifyPortalContent, 'setShowFields')
