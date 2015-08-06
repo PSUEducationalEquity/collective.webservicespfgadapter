@@ -12,8 +12,7 @@ logger = logging.getLogger("WebServicesPFGAdapter")
 from Products.Archetypes.public import process_types, listTypes
 from Products.CMFCore import utils
 
-from collective.webservicespfgadapter.config import PROJECT_NAME, \
-    WSA_ADD_CONTENT_PERMISSION
+from collective.webservicespfgadapter.config import *
 from Products.PloneFormGen.config import ADD_CONTENT_PERMISSION
 
 

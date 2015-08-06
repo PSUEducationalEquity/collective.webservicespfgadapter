@@ -32,3 +32,14 @@ PROJECT_NAME = 'WebServicesPFGAdapter'
 WSA_ADD_CONTENT_PERMISSION = 'PloneFormGen: Add Web Service Adapters'
 setDefaultRoles(WSA_ADD_CONTENT_PERMISSION, ('Manager', 'Owner', ))
 
+# Permission to set the submission url
+EDIT_URL_PERMISSION = 'PloneFormGen: Edit Web Service URL Settings'
+setDefaultRoles(EDIT_URL_PERMISSION, ('Manager', 'Owner', ))
+
+# Permission to manage the failure settings
+EDIT_FAILURE_SETTINGS_PERMISSION = 'PloneFormGen: Edit Web Service Adapter Failure Settings'
+setDefaultRoles(EDIT_FAILURE_SETTINGS_PERMISSION, ('Manager', ))
+
+# Permission to access saved failed submissions
+MANAGE_FAILED_SUBMISSIONS_PERMISSION = 'PloneFormGen: Manage Failed Web Service Submissions'
+setDefaultRoles(MANAGE_FAILED_SUBMISSIONS_PERMISSION, ('Manager', ))
