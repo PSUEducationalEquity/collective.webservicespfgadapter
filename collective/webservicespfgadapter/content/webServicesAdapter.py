@@ -20,8 +20,6 @@ from Products.PloneFormGen.interfaces import IPloneFormGenForm
 
 from collective.webservicespfgadapter.config import extra_data
 
-from Products.TemplateFields import ZPTField as ZPTField
-
 from types import StringTypes
 
 import json, requests
@@ -69,24 +67,104 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
             format='checkbox',
             ),
         ),
-    ZPTField('submission_pt',
-        schemata='template',
-        write_permission=EDIT_TALES_PERMISSION,
+    BooleanField('failSilently',
+        required=0,
+        searchable=0,
+        default='0',
         read_permission=ModifyPortalContent,
-        widget=TextAreaWidget(
-            label=u'Submission template',
+        widget=BooleanWidget(
+            label=u'Fail silently',
             description=u"""
-                This is the Zope Page Template used for rendering of the
-                submission JSON. You don\'t need to modify it, but if you know
-                TAL (Zope\'s Template Attribute Language) you have the full
-                power to customize your submission to the web service.
-                """,
-            rows=20,
-            visible={'edit': 'visible', 'view': 'invisible'},
+                If an error occurs while submitting the data to the web
+                service all warnings and error messages WILL BE SUPPRESSED.
+                ONLY enable this option if you have configured another action
+                adapter, otherwise the form data WILL BE LOST!
+                """),
             ),
-        validators=('zptvalidator', ),
+        ),
+    BooleanField('storeFailedSubmissions',
+        required=0,
+        searchable=0,
+        default='0',
+        read_permission=ModifyPortalContent,
+        widget=BooleanWidget(
+            label=u'Store failed submissions locally',
+            description=u"""
+                If an error occurs while submitting the form data to the web
+                service, the entire submission will be stored in this action
+                adapter for later retrieval and an email will be sent to the
+                address listed in 'Notify on failure'.
+                """),
+            ),
+        ),
+    StringField('notifyOnFailure',
+        required=0,
+        searchable=0,
+        read_permission=ModifyPortalContent,
+        widget=StringWidget(
+            label=u'Notify on failure',
+            description=u"""
+                Comma separated list of email addresses that will be notified
+                if an error occurs while submitting the form data to the web
+                service AND 'Store failed submissions locally' is checked.
+                """),
+            ),
+        ),
+    BooleanField('runDisabledAdapters',
+        required=0,
+        searchable=0,
+        default='0',
+        read_permission=ModifyPortalContent,
+        widget=BooleanWidget(
+            label=u'Run disabled adapters',
+            description=u"""
+                If an error occurs while submitting the form data to the web
+                service, should any disabled action adapters be run?
+                This allows you to setup other action adapters (e.g. Save
+                Data Adapter) that are ONLY run when an error occurs while
+                submitting to the web service.
+                """),
+            ),
+        ),
+    LinesField('failedSubmissions',
+        required=0,
+        searchable=0,
+        read_permission=ModifyPortalContent,
+        schemata='failures',
+        widget=LinesWidget(
+            label=u'Submissions that failed to send to the web service',
+            description=u"""
+                Submissions that failed to go through to the web service are
+                stored here if 'Store failed submissions locally' is checked.
+                The submissions are stored one per line in JSON format
+                unless an encryption key is present, then they are stored
+                one per line with carriage returns replaced by pipes (|).
+                """),
+            ),
         ),
 ))
+
+# if gpg is not None:
+#     formWebServiceAdapterSchema = formWebServiceAdapterSchema + Schema((
+#         StringField('gpg_keyid',
+#             schemata='encryption',
+#             accessor='getGPGKeyId',
+#             mutator='setGPGKeyId',
+#             write_permission=USE_ENCRYPTION_PERMISSION,
+#             read_permission=ModifyPortalContent,
+#             widget=StringWidget(
+#                 label=u'Key-Id',
+#                 description=u"""
+#                     Give your key-id, email address, or whatever works to
+#                     match a public key from the current keyring.
+#                     It will be used to encrypt the entire failed submission.
+#                     Contact the site administrator if you need to install a
+#                     new public key.
+#                     TEST THIS FEATURE BEFORE GOING PUBLIC!
+#                     """),
+#                 ),
+#             ),
+#         ))
 
 
 class FormWebServiceAdapter(FormActionAdapter):
