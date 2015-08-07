@@ -239,7 +239,13 @@ class FormWebServiceAdapter(FormActionAdapter):
                 if isinstance(e, requests.exceptions.ConnectionError):
                     message = "Ugh! Server's down :("
                 elif isinstance(e, requests.exceptions.Timeout):
-                    message = "Gitty Up! Crack the whip on the server."
+                    message = "Bummer. The tubes appear to be clogged today."
+                elif isinstance(e, requests.exceptions.HTTPError):
+                    message = "Say what!?! Did not understand the response " \
+                        + "from the web service."
+                elif isinstance(e, requests.exceptions.TooManyRedirects):
+                    message = "Lost! The web service has be bouncing all " \
+                        + "over and I don't know where I'm going."
                 else:
                     message = "Ack! something went horribly wrong!"
                 logger.exception(message)
@@ -247,12 +253,16 @@ class FormWebServiceAdapter(FormActionAdapter):
                 #         a field with id 'form' the message isn't displayed.
                 #         Determine if they is a way to return a non-field
                 #         specific error message.
+                #
+                #         This keeps the form from submitting successfully
+                #         as far as the user is concerned, but doesn't tell
+                #         them why things didn't work.
                 return { 'form': message }
 
             else:
                 # swallow the exception, but log it
                 t, v = sys.exc_info()[:2]
-                logger.exception('Unable to save form data to web service. (%s)' % '/'.join(self.getPhysicalPath()))
+                logger.exception('Unable to save form data to the web service. (%s)' % '/'.join(self.getPhysicalPath()))
 
                 # get all the active and inactive save data and mailer adapters
                 formFolder = self._getParentForm()
