@@ -282,11 +282,14 @@ class FormWebServiceAdapter(FormActionAdapter):
         except Exception as e:
             if not self.failSilently:
                 if isinstance(e, requests.exceptions.ConnectionError):
-                    print "Ugh! Server's down :("
+                    message = "Ugh! Server's down :("
                 elif isinstance(e, requests.exceptions.Timeout):
-                    print "Gitty Up! Crack the whip on the server."
+                    message = "Gitty Up! Crack the whip on the server."
                 else:
-                    print "Ack! something went horribly wrong!"
+                    message = "Ack! something went horribly wrong!"
+                logger.exception(message)
+                return { 'form': message }
+
             else:
                 # swallow the exception, but log it
                 t, v = sys.exc_info()[:2]
