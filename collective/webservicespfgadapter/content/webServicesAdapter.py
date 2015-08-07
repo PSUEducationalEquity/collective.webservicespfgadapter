@@ -279,10 +279,14 @@ class FormWebServiceAdapter(FormActionAdapter):
         message = None
         try:
             self._onSuccess(fields, REQUEST)
-        except:
+        except Exception as e:
             if not self.failSilently:
-                raise
-
+                if isinstance(e, requests.exceptions.ConnectionError):
+                    print "Ugh! Server's down :("
+                elif isinstance(e, requests.exceptions.Timeout):
+                    print "Gitty Up! Crack the whip on the server."
+                else:
+                    print "Ack! something went horribly wrong!"
             else:
                 # swallow the exception, but log it
                 t, v = sys.exc_info()[:2]
