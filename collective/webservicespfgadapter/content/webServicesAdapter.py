@@ -125,8 +125,9 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
 
 
 class FormWebServiceAdapter(FormActionAdapter):
-    """ A form action adapter that sends the form submission to a web service. """
-
+    """
+    A form action adapter that sends the form submission to a web service.
+    """
     schema = formWebServiceAdapterSchema
     portal_type = meta_type = 'FormWebServiceAdapter'
     archetype_name = 'Web Service Adapter'
@@ -136,8 +137,11 @@ class FormWebServiceAdapter(FormActionAdapter):
 
     security.declareProtected(View, 'allFieldDisplayList')
 
+
     def allFieldDisplayList(self):
-        """ returns a DisplayList of all fields """
+        """
+        returns a DisplayList of all fields
+        """
         return self.fgFieldsDisplayList()
 
 
@@ -150,7 +154,9 @@ class FormWebServiceAdapter(FormActionAdapter):
 
     security.declareProtected(View, 'extraDataDisplayList')
     def extraDataDisplayList(self):
-        """ returns a DisplayList of the extra data options """
+        """
+        returns a DisplayList of the extra data options
+        """
         dl = DisplayList()
         for key, value in extra_data.iteritems():
             dl.add(key, value)
@@ -159,7 +165,9 @@ class FormWebServiceAdapter(FormActionAdapter):
 
     security.declarePrivate('_getParentForm')
     def _getParentForm(self):
-        """ Gets the IPloneFormGenForm parent of this object. """
+        """
+        Gets the IPloneFormGenForm parent of this object.
+        """
         parent = self.aq_parent
         while not IPloneFormGenForm.providedBy(parent):
             try:
@@ -234,6 +242,10 @@ class FormWebServiceAdapter(FormActionAdapter):
                 else:
                     message = "Ack! something went horribly wrong!"
                 logger.exception(message)
+                ### TODO: currently this returns an error but unless there is
+                #         a field with id 'form' the message isn't displayed.
+                #         Determine if they is a way to return a non-field
+                #         specific error message.
                 return { 'form': message }
 
             else:
@@ -241,7 +253,8 @@ class FormWebServiceAdapter(FormActionAdapter):
                 t, v = sys.exc_info()[:2]
                 logger.exception('Unable to save form data to web service. (%s)' % '/'.join(self.getPhysicalPath()))
 
-                formFolder = aq_parent(self)
+                # get all the active and inactive save data and mailer adapters
+                formFolder = self._getParentForm()
                 enabled_adapters = formFolder.getActionAdapter()
                 adapters = [o for o in formFolder.objectValues() if IPloneFormGenActionAdapter.providedBy(o)]
                 active_savedata = [o for o in adapters if isinstance(o, FormSaveDataAdapter)
@@ -285,23 +298,17 @@ class FormWebServiceAdapter(FormActionAdapter):
                         #   the web service fails.
                         adapter.onSuccess(fields, REQUEST)
 
-                if self.storeFailedSubmissions:
-                    ### TODO: store the submission data in JSON format in
-                    #         self.failedSubmissions
-                    message += "  - Locally [coming soon] (%s)\n" % self.absolute_url()
-
                 if not active_savedata and not inactive_savedata and \
                    not active_mailer and not inactive_mailer and \
                    not self.storeFailedSubmissions:
                     message += "  - NO WHERE! The data was lost.\n"
-
 
                 message += "\nTechnical details on the exception:\n"
                 message += ''.join(traceback.format_exception_only(t, v))
 
                 # send an email if an address is provided
                 if self.notifyOnFailure:
-                    # get configuration from Plone
+                    # get email configuration from Plone
                     pprops = getToolByName(self, 'portal_properties')
                     site_props = getToolByName(pprops, 'site_properties')
                     portal = getToolByName(self, 'portal_url').getPortalObject()
@@ -315,10 +322,7 @@ class FormWebServiceAdapter(FormActionAdapter):
                             mto=self.notifyOnFailure,
                             mfrom=from_addr,
                             subject='Form submission to web service failed',
-                            encode=None,
                             immediate=False,
-                            charset='utf8',
-                            msg_type='type/plain'
                             )
                     except Exception as e:
                             logger.exception(e)
@@ -326,7 +330,9 @@ class FormWebServiceAdapter(FormActionAdapter):
 
     security.declareProtected(ModifyPortalContent, 'setShowFields')
     def setShowFields(self, value, **kwargs):
-        """ Reorder form inputs to match field order. """
+        """
+        Reorder form inputs to match field order.
+        """
         # This wouldn't be necessary if the PickWidget retained order.
         self.showFields = []
         for field in self.fgFields(excludeServerSide=False):
