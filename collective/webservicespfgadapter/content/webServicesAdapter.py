@@ -257,7 +257,7 @@ class FormWebServiceAdapter(FormActionAdapter):
             response = requests.post(
                 self.url,
                 data=submission,
-                timeout=1.5
+                timeout=2,
                 )
         except:
             raise
