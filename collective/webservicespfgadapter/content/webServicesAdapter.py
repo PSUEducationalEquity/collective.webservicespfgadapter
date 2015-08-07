@@ -208,10 +208,11 @@ class FormWebServiceAdapter(FormActionAdapter):
             'data': json.dumps(data),
             }
         try:
+            # timeout is set for 10 seconds which is an eternity on the web
             response = requests.post(
                 self.url,
                 data=submission,
-                timeout=2,
+                timeout=10,
                 )
         except:
             raise
