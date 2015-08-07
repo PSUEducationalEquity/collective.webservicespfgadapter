@@ -89,21 +89,6 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
                 """,
             ),
         ),
-    BooleanField('storeFailedSubmissions',
-        required=0,
-        searchable=0,
-        default='0',
-        write_permission=EDIT_FAILURE_SETTINGS_PERMISSION,
-        read_permission=ModifyPortalContent,
-        widget=BooleanWidget(
-            label=u'Store failed submissions locally',
-            description=u"""
-                If an error occurs while submitting the form data to the web
-                service, the entire submission will be stored in this action
-                adapter for later retrieval.
-                """,
-            ),
-        ),
     StringField('notifyOnFailure',
         required=0,
         searchable=0,
@@ -133,23 +118,6 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
                 This allows you to setup other action adapters (e.g. Save
                 Data Adapter) that are ONLY run when an error occurs while
                 submitting to the web service.
-                """,
-            ),
-        ),
-    LinesField('failedSubmissions',
-        required=0,
-        searchable=0,
-        write_permission=MANAGE_FAILED_SUBMISSIONS_PERMISSION,
-        read_permission=ModifyPortalContent,
-        schemata='failures',
-        widget=LinesWidget(
-            label=u'Submissions that failed to send to the web service',
-            description=u"""
-                Submissions that failed to go through to the web service are
-                stored here if 'Store failed submissions locally' is checked.
-                The submissions are stored one per line in JSON format
-                unless an encryption key is present, then they are stored
-                one per line with carriage returns replaced by pipes (|).
                 """,
             ),
         ),
