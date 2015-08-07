@@ -311,28 +311,29 @@ class FormWebServiceAdapter(FormActionAdapter):
                 message = "Someone submitted this form (%s), but the data " \
                     + "couldn't be saved to the web service due to an exception." \
                     + "\n\n" \
-                    + "The data was saved in the following locations:\n" % (
-                        formFolder.absolute_url()
+                    + "The data was saved in the following locations:\n"
+                message = message % (
+                        formFolder.absolute_url(),
                         )
 
                 # add a list of where the data was stored to the email message
                 for adapter in active_savedata:
-                    message += "  - Save Data Adapter (%s)\n" % (adapter.absolute_url())
+                    message += "  - Save Data Adapter (%s)\n" % adapter.absolute_url()
 
                 if self.runDisabledAdapters:
                     for adapter in inactive_savedata:
-                        message += "  - Save Data Adapter (%s)\n" % (adapter.absolute_url())
+                        message += "  - Save Data Adapter (%s)\n" % adapter.absolute_url()
                         # Trigger the adapter since it's disabled.
                         # This can be used to record data *only* when submitting to
                         #   the web service fails.
                         adapter.onSuccess(fields, REQUEST)
 
                 for adapter in active_mailer:
-                    message += "  - Mailer Adapter (%s)\n" % (adapter.absolute_url())
+                    message += "  - Mailer Adapter (%s)\n" % adapter.absolute_url()
 
                 if self.runDisabledAdapters:
                     for adapter in inactive_mailer:
-                        message += "  - Mailer Adapter (%s)\n" % (adapter.absolute_url())
+                        message += "  - Mailer Adapter (%s)\n" % adapter.absolute_url()
                         # Trigger the adapter since it's disabled.
                         # This can be used to record data *only* when submitting to
                         #   the web service fails.
@@ -341,7 +342,7 @@ class FormWebServiceAdapter(FormActionAdapter):
                 if self.storeFailedSubmissions:
                     ### TODO: store the submission data in JSON format in
                     #         self.failedSubmissions
-                    message += "  - Locally [coming soon] (%s)\n" % (self.absolute_url())
+                    message += "  - Locally [coming soon] (%s)\n" % self.absolute_url()
 
                 if not active_savedata and not inactive_savedata and \
                    not active_mailer and not inactive_mailer and \
@@ -352,18 +353,30 @@ class FormWebServiceAdapter(FormActionAdapter):
                 message += "\nTechnical details on the exception:\n"
                 message += ''.join(traceback.format_exception_only(t, v))
 
+                # send an email if an address is provided
                 if self.notifyOnFailure:
-                    mailer = getToolByName(context, 'MailHost')
-                    mailer.send(
-                        message,
-                        mto=self.notifyOnFailure,
-                        mfrom=None,
-                        subject='Form submission to web service failed',
-                        encode=None,
-                        immediate=False,
-                        charset='utf8',
-                        msg_type='type/plain'
-                        )
+                    # get configuration from Plone
+                    pprops = getToolByName(self, 'portal_properties')
+                    site_props = getToolByName(pprops, 'site_properties')
+                    portal = getToolByName(self, 'portal_url').getPortalObject()
+
+                    from_addr = site_props.getProperty('email_from_address') or \
+                        portal.getProperty('email_from_address')
+                    mailer = getToolByName(self, 'MailHost')
+                    import pdb; pdb.set_trace()
+                    try:
+                        mailer.send(
+                            message,
+                            mto=self.notifyOnFailure,
+                            mfrom=from_addr,
+                            subject='Form submission to web service failed',
+                            encode=None,
+                            immediate=False,
+                            charset='utf8',
+                            msg_type='type/plain'
+                            )
+                    except Exception as e:
+                            logger.exception(e)
 
 
     security.declareProtected(ModifyPortalContent, 'setShowFields')
