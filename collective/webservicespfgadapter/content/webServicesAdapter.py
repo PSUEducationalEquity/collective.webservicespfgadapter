@@ -123,28 +123,6 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
         ),
 ))
 
-# if gpg is not None:
-#     formWebServiceAdapterSchema = formWebServiceAdapterSchema + Schema((
-#         StringField('gpg_keyid',
-#             schemata='encryption',
-#             accessor='getGPGKeyId',
-#             mutator='setGPGKeyId',
-#             write_permission=USE_ENCRYPTION_PERMISSION,
-#             read_permission=ModifyPortalContent,
-#             widget=StringWidget(
-#                 label=u'Key-Id',
-#                 description=u"""
-#                     Give your key-id, email address, or whatever works to
-#                     match a public key from the current keyring.
-#                     It will be used to encrypt the entire failed submission.
-#                     Contact the site administrator if you need to install a
-#                     new public key.
-#                     TEST THIS FEATURE BEFORE GOING PUBLIC!
-#                     """),
-#                 ),
-#             ),
-#         ))
-
 
 class FormWebServiceAdapter(FormActionAdapter):
     """ A form action adapter that sends the form submission to a web service. """
