@@ -310,8 +310,7 @@ class FormWebServiceAdapter(FormActionAdapter):
                         adapter.onSuccess(fields, REQUEST)
 
                 if not active_savedata and not inactive_savedata and \
-                   not active_mailer and not inactive_mailer and \
-                   not self.storeFailedSubmissions:
+                   not active_mailer and not inactive_mailer:
                     message += "  - NO WHERE! The data was lost.\n"
 
                 message += "\nTechnical details on the exception:\n"
