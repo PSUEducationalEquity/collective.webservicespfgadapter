@@ -363,7 +363,6 @@ class FormWebServiceAdapter(FormActionAdapter):
                     from_addr = site_props.getProperty('email_from_address') or \
                         portal.getProperty('email_from_address')
                     mailer = getToolByName(self, 'MailHost')
-                    import pdb; pdb.set_trace()
                     try:
                         mailer.send(
                             message,
