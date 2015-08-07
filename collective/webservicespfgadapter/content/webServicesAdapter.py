@@ -99,7 +99,7 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
             description=u"""
                 Comma separated list of email addresses that will be notified
                 if an error occurs while submitting the form data to the web
-                service.
+                service and 'Fail Silently' is checked.
                 """,
             ),
         ),
