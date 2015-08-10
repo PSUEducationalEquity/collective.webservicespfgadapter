@@ -7,7 +7,7 @@ setup(name='collective.webservicespfgadapter',
       version=version,
       description="PloneFormGen adapter that sends the form submission \
           to a web service",
-      long_description=open("README.txt").read() + "\n" +
+      long_description=open("README.md").read() + "\n" +
                        open("CHANGES.txt").read(),
       # Get more strings from
       # http://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -27,7 +27,6 @@ setup(name='collective.webservicespfgadapter',
       install_requires=[
           'setuptools',
           'Products.PloneFormGen>=1.7.0',
-          'Products.TALESField',
           'requests',
       ],
       entry_points="""
