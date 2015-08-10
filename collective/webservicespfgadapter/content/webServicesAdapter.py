@@ -251,13 +251,13 @@ class FormWebServiceAdapter(FormActionAdapter):
                 enabled_adapters = formFolder.getActionAdapter()
                 adapters = [o for o in formFolder.objectValues() if IPloneFormGenActionAdapter.providedBy(o)]
                 active_savedata = [o for o in adapters if isinstance(o, FormSaveDataAdapter)
-                                                       and o in enabled_adapters]
+                                                       and o.id in enabled_adapters]
                 inactive_savedata = [o for o in adapters if isinstance(o, FormSaveDataAdapter)
-                                                         and o not in enabled_adapters]
+                                                         and o.id not in enabled_adapters]
                 active_mailer = [o for o in adapters if isinstance(o, FormMailerAdapter)
-                                                     and o in enabled_adapters]
+                                                     and o.id in enabled_adapters]
                 inactive_mailer = [o for o in adapters if isinstance(o, FormMailerAdapter)
-                                                       and o not in enabled_adapters]
+                                                       and o.id not in enabled_adapters]
 
                 # start the failure email message
                 message = "Someone submitted this form (%s), but the data " \
@@ -271,10 +271,12 @@ class FormWebServiceAdapter(FormActionAdapter):
                 # add a list of where the data was stored to the email message
                 for adapter in active_savedata:
                     message += "  - Save Data Adapter (%s)\n" % adapter.absolute_url()
+                    print "  - Active Save Data Adapter (%s)\n" % adapter.absolute_url()
 
                 if self.runDisabledAdapters:
                     for adapter in inactive_savedata:
                         message += "  - Save Data Adapter (%s)\n" % adapter.absolute_url()
+                        print "  - Save Data Adapter (%s)\n" % adapter.absolute_url()
                         # Trigger the adapter since it's disabled.
                         # This can be used to record data *only* when submitting to
                         #   the web service fails.
@@ -282,10 +284,12 @@ class FormWebServiceAdapter(FormActionAdapter):
 
                 for adapter in active_mailer:
                     message += "  - Mailer Adapter (%s)\n" % adapter.absolute_url()
+                    print "  - Active Mailer Adapter (%s)\n" % adapter.absolute_url()
 
                 if self.runDisabledAdapters:
                     for adapter in inactive_mailer:
                         message += "  - Mailer Adapter (%s)\n" % adapter.absolute_url()
+                        print "  - Mailer Adapter (%s)\n" % adapter.absolute_url()
                         # Trigger the adapter since it's disabled.
                         # This can be used to record data *only* when submitting to
                         #   the web service fails.
@@ -294,6 +298,7 @@ class FormWebServiceAdapter(FormActionAdapter):
                 if not active_savedata and not inactive_savedata and \
                    not active_mailer and not inactive_mailer:
                     message += "  - NO WHERE! The data was lost.\n"
+                    print "  - NO WHERE! The data was lost.\n"
 
                 message += "\nTechnical details on the exception:\n"
                 message += ''.join(traceback.format_exception_only(t, v))
