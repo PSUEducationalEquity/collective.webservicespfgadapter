@@ -199,10 +199,15 @@ class FormWebServiceAdapter(FormActionAdapter):
         Submits the form data to the web service.
         """
         data = OrderedDict()
+        fieldset = ''
         showFields = getattr(self, 'showFields', [])
         for field in fields:
             if showFields and field.id not in showFields:
                 continue
+            if field.isLabel() and field.portal_type == 'FieldsetStart':
+                fieldset = field.title
+            elif field.isLabel() and field.portal_type == 'FieldsetEnd':
+                fieldset = ''
             if not field.isLabel():
                 val = REQUEST.form.get(field.fgField.getName(), '')
                 if not type(val) in StringTypes:
@@ -214,6 +219,12 @@ class FormWebServiceAdapter(FormActionAdapter):
                 and self.fieldset_separator != '':
                     title = "%s%s%s" % (
                         field.aq_parent.title,
+                        self.fieldset_separator,
+                        field.title
+                        )
+                elif fieldset != '' and self.fieldset_separator != '':
+                    title = "%s%s%s" % (
+                        fieldset,
                         self.fieldset_separator,
                         field.title
                         )
