@@ -6,6 +6,8 @@ Change History
 - Submitted data uses OrderedDict to maintain field order in submission
 - Add an incrementing number to duplicate field names
 - Fieldset titles can be prepended to field names
+- Removed some of the extra data that was meaningless
+- Improved the extra data descriptions
 
 
 1.0.0

@@ -10,13 +10,11 @@ from Products.CMFCore.permissions import setDefaultRoles
 ### Things you might customize for your site
 
 extra_data = {
-    'REMOTE_ADDR': 'IP address of the user who completed the form',
-    'REMOTE_USER': 'Logged in user (when applicable)',
-    'REMOTE_REALM': 'Domain of the logged in user (when applicable)',
-    'PATH_INFO': 'Path to the form submitted',
-    'HTTP_X_FORWARDED_FOR': 'HTTP_X_FORWARDED_FOR',
-    'HTTP_USER_AGENT': "Description of the user's browser",
-    'HTTP_REFERER': 'Web page the user visited before filling out the form',
+    'REMOTE_USER': 'Logged in user',
+    'REMOTE_REALM': "User's domain",
+    'HTTP_X_FORWARDED_FOR': "User's address",
+    'HTTP_USER_AGENT': "User's browser",
+    'HTTP_REFERER': "Form's address",
     }
 
 
