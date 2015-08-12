@@ -19,7 +19,8 @@ from Products.PloneFormGen.content.actionAdapter import \
     FormActionAdapter, FormAdapterSchema
 from Products.PloneFormGen.content.formMailerAdapter import FormMailerAdapter
 from Products.PloneFormGen.content.saveDataAdapter import FormSaveDataAdapter
-from Products.PloneFormGen.interfaces import IPloneFormGenForm, IPloneFormGenActionAdapter
+from Products.PloneFormGen.interfaces import \
+    IPloneFormGenActionAdapter, IPloneFormGenFieldset, IPloneFormGenForm
 
 from collective.webservicespfgadapter.config import *
 
@@ -58,6 +59,20 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
                 Pick the fields whose inputs you would like to include in
                 the web service submission. If empty, all fields will be sent.
                 """,
+            ),
+        ),
+    StringField('fieldset_separator',
+        required=0,
+        searchable=0,
+        default=' / ',
+        read_permission=ModifyPortalContent,
+        widget=StringWidget(
+            label=u'Fieldset separator',
+            description=u"""
+                For fields contained in a fieldset, prefix the field name
+                with the fieldset title and separate them with these
+                characters. If blank, the fieldset title is NOT prepended.
+                """
             ),
         ),
     LinesField('extraData',
@@ -194,8 +209,14 @@ class FormWebServiceAdapter(FormActionAdapter):
                     # Zope has marshalled the field into
                     # something other than a string
                     val = str(val)
-                # if fields have the same title, add an incrementing number
                 title = field.title
+                if IPloneFormGenFieldset.providedBy(field.aq_parent) \
+                and self.fieldset_separator != '':
+                    title = "%s%s%s" % (
+                        field.aq_parent.title,
+                        self.fieldset_separator,
+                        field.title
+                        )
                 if title in data.keys():
                     # start at 2 since the title without a number is 1
                     increment = 2
