@@ -183,21 +183,21 @@ class FormWebServiceAdapter(FormActionAdapter):
         Submits the form data to the web service.
         """
         data = {}
-        for f in fields:
-            showFields = getattr(self, 'showFields', [])
-            if showFields and f.id not in showFields:
+        showFields = getattr(self, 'showFields', [])
+        for field in fields:
+            if showFields and field.id not in showFields:
                 continue
-            if not f.isLabel():
-                val = REQUEST.form.get(f.fgField.getName(), '')
+            if not field.isLabel():
+                val = REQUEST.form.get(field.fgField.getName(), '')
                 if not type(val) in StringTypes:
                     # Zope has marshalled the field into
                     # something other than a string
                     val = str(val)
-                data[f.title] = val
+                data[field.title] = val
 
         if self.extraData:
-            for f in self.extraData:
-                data[extra_data[f]] = getattr(REQUEST, f, '')
+            for field in self.extraData:
+                data[extra_data[field]] = getattr(REQUEST, field, '')
 
         pfg = self._getParentForm()
         submission = {
