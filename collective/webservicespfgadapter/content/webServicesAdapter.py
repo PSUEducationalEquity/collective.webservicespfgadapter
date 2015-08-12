@@ -194,7 +194,15 @@ class FormWebServiceAdapter(FormActionAdapter):
                     # Zope has marshalled the field into
                     # something other than a string
                     val = str(val)
-                data[field.title] = val
+                # if fields have the same title, add an incrementing number
+                title = field.title
+                if title in data.keys():
+                    # start at 2 since the title without a number is 1
+                    increment = 2
+                    while "%s %s" % (title, increment) in data.keys():
+                        increment += 1
+                    title = "%s %s" % (title, increment)
+                data[title] = val
 
         if self.extraData:
             for field in self.extraData:

@@ -4,6 +4,7 @@ Change History
 1.0.1
 ----------------
 - Submitted data uses OrderedDict to maintain field order in submission
+- Add an incrementing number to duplicate field names
 
 
 1.0.0
