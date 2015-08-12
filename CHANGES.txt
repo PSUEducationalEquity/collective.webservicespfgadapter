@@ -1,6 +1,11 @@
 Change History
 ==============
 
+1.0.1
+----------------
+- Submitted data uses OrderedDict to maintain field order in submission
+
+
 1.0.0
 ----------------
 

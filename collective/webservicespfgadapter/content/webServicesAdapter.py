@@ -23,6 +23,7 @@ from Products.PloneFormGen.interfaces import IPloneFormGenForm, IPloneFormGenAct
 
 from collective.webservicespfgadapter.config import *
 
+from collections import OrderedDict
 from types import StringTypes
 
 import json, logging, requests, sys, traceback
@@ -182,7 +183,7 @@ class FormWebServiceAdapter(FormActionAdapter):
         """
         Submits the form data to the web service.
         """
-        data = {}
+        data = OrderedDict()
         showFields = getattr(self, 'showFields', [])
         for field in fields:
             if showFields and field.id not in showFields:
