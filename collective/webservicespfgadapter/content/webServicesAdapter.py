@@ -18,6 +18,7 @@ from Products.PloneFormGen.config import *
 from Products.PloneFormGen.content.actionAdapter import \
     FormActionAdapter, FormAdapterSchema
 from Products.PloneFormGen.content.formMailerAdapter import FormMailerAdapter
+from Products.PloneFormGen.content.likertField import LikertField
 from Products.PloneFormGen.content.saveDataAdapter import FormSaveDataAdapter
 from Products.PloneFormGen.interfaces import \
     IPloneFormGenActionAdapter, IPloneFormGenFieldset, IPloneFormGenForm
@@ -210,7 +211,17 @@ class FormWebServiceAdapter(FormActionAdapter):
                 fieldset = ''
             if not field.isLabel():
                 val = REQUEST.form.get(field.fgField.getName(), '')
-                if not type(val) in StringTypes:
+                if isinstance(val, list):
+                    pass
+                elif isinstance(field.fgField, LikertField):
+                    likert_vals = OrderedDict()
+                    for index, question in enumerate(field.getLikertQuestions()):
+                        try:
+                            likert_vals[question] = val[str(index + 1)]
+                        except KeyError:
+                            pass
+                    val = likert_vals
+                elif not type(val) in StringTypes:
                     # Zope has marshalled the field into
                     # something other than a string
                     val = str(val)
