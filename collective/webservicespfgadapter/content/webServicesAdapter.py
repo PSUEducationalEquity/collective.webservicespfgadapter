@@ -218,8 +218,8 @@ class FormWebServiceAdapter(FormActionAdapter):
                     for index, question in enumerate(field.getLikertQuestions()):
                         try:
                             likert_vals[question] = val[str(index + 1)]
-                        except KeyError:
-                            pass
+                        except (KeyError, TypeError):
+                            likert_vals[question] = 'No answer'
                     val = likert_vals
                 elif not type(val) in StringTypes:
                     # Zope has marshalled the field into
