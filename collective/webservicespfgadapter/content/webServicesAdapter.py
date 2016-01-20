@@ -257,7 +257,7 @@ class FormWebServiceAdapter(FormActionAdapter):
             'name': pfg.title,
             'url': pfg.absolute_url(),
             'owner': pfg.Creator(),
-            'data': json.dumps(data),
+            'data': json.dumps(data, default=lambda obj: obj.__dict__),
             }
         try:
             # timeout is set for 5 seconds which is an eternity on the web
