@@ -211,9 +211,7 @@ class FormWebServiceAdapter(FormActionAdapter):
                 fieldset = ''
             if not field.isLabel():
                 val = REQUEST.form.get(field.fgField.getName(), '')
-                if isinstance(val, list):
-                    pass
-                elif isinstance(field.fgField, LikertField):
+                if isinstance(field.fgField, LikertField):
                     likert_vals = OrderedDict()
                     for index, question in enumerate(field.getLikertQuestions()):
                         try:
@@ -221,6 +219,8 @@ class FormWebServiceAdapter(FormActionAdapter):
                         except (KeyError, TypeError):
                             likert_vals[question] = 'No answer'
                     val = likert_vals
+                elif isinstance(val, list):
+                    pass
                 elif not type(val) in StringTypes:
                     # Zope has marshalled the field into
                     # something other than a string
