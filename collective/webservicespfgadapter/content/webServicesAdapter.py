@@ -199,6 +199,17 @@ class FormWebServiceAdapter(FormActionAdapter):
         """
         Submits the form data to the web service.
         """
+        try:
+            from Products.DataGridField.DataGridField import DataGridField
+        except ImportError:
+            print "Data Grid: Not Installed!"
+            data_grid_installed = False
+            class DataGridField:
+                pass
+        else:
+            print "Data Grid: Installed"
+            data_grid_installed = True
+
         data = OrderedDict()
         fieldset = ''
         showFields = getattr(self, 'showFields', [])
@@ -211,7 +222,24 @@ class FormWebServiceAdapter(FormActionAdapter):
                 fieldset = ''
             if not field.isLabel():
                 val = REQUEST.form.get(field.fgField.getName(), '')
-                if isinstance(field.fgField, LikertField):
+                if data_grid_installed and isinstance(field.fgField, DataGridField):
+                    # Get the friendly column titles from the PFGDataGridField
+                    #   and add a 'headings' row to the results.
+                    headings = OrderedDict()
+                    headings['orderindex_'] = 'headings'
+                    for column in field.columnDefs:
+                        headings[column['columnId']] = column['columnTitle']
+                    # Update `val` to be a list of OrderedDicts so that the
+                    #   columns are in the right order.
+                    value = [headings, ]
+                    for rowdict in val:
+                        if rowdict.get('orderindex_', '') != 'template_row_marker':
+                            entry = OrderedDict()
+                            for column_id in headings.keys():
+                                entry[column_id] = rowdict.get(column_id, '')
+                            value.append(entry)
+                    val = value
+                elif isinstance(field.fgField, LikertField):
                     likert_vals = OrderedDict()
                     for index, question in enumerate(field.getLikertQuestions()):
                         try:
