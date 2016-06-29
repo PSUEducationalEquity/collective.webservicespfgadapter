@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.1.0'
+version = '1.2.0'
 
 setup(name='collective.webservicespfgadapter',
       version=version,
@@ -26,6 +26,7 @@ setup(name='collective.webservicespfgadapter',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'plone.api>=1.5',
           'Products.PloneFormGen>=1.7.0',
           'requests',
       ],
