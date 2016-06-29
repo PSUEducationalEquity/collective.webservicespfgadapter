@@ -26,6 +26,7 @@ from Products.PloneFormGen.interfaces import \
 from collective.webservicespfgadapter.config import *
 
 from collections import OrderedDict
+from plone import api
 from types import StringTypes
 
 import json, logging, requests, sys, traceback
@@ -277,7 +278,11 @@ class FormWebServiceAdapter(FormActionAdapter):
 
         if self.extraData:
             for field in self.extraData:
-                data[extra_data[field]] = getattr(REQUEST, field, '')
+                if field == 'REMOTE_USER':
+                    user = api.user.get_current()
+                    data[extra_data[field]] = user.getUserName()
+                else:
+                    data[extra_data[field]] = getattr(REQUEST, field, '')
 
         pfg = self._getParentForm()
         submission = {
