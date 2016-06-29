@@ -278,11 +278,16 @@ class FormWebServiceAdapter(FormActionAdapter):
 
         if self.extraData:
             for field in self.extraData:
-                if field == 'REMOTE_USER':
+                if field == 'USER':
                     user = api.user.get_current()
                     data[extra_data[field]] = user.getUserName()
+                elif field == 'REMOTE_ADDR':
+                    if 'HTTP_X_FORWARDED_FOR' in REQUEST.keys():
+                        data[extra_data[field]] = REQUEST.getHeader('HTTP_X_FORWARDED_FOR')
+                    else:
+                        data[extra_data[field]] = REQUEST.getHeader('REMOTE_ADDR')
                 else:
-                    data[extra_data[field]] = getattr(REQUEST, field, '')
+                    data[extra_data[field]] = REQUEST.getHeader(field)
 
         pfg = self._getParentForm()
         submission = {
