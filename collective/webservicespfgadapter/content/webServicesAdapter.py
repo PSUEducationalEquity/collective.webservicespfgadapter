@@ -203,12 +203,10 @@ class FormWebServiceAdapter(FormActionAdapter):
         try:
             from Products.DataGridField.DataGridField import DataGridField
         except ImportError:
-            print "Data Grid: Not Installed!"
             data_grid_installed = False
             class DataGridField:
                 pass
         else:
-            print "Data Grid: Installed"
             data_grid_installed = True
 
         data = OrderedDict()
