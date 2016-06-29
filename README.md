@@ -32,6 +32,7 @@ Plone: Plone 4.3.6 (only tested with this version)
 
 Requires:
 
+* Plone.API (tested with version 1.5)
 * PloneFormGen (tested with version 1.7.17)
 * Requests (automatically installed if you install via Python package)
 

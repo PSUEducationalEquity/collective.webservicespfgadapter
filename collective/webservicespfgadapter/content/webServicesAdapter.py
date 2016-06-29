@@ -26,6 +26,7 @@ from Products.PloneFormGen.interfaces import \
 from collective.webservicespfgadapter.config import *
 
 from collections import OrderedDict
+from plone import api
 from types import StringTypes
 
 import json, logging, requests, sys, traceback
@@ -202,12 +203,10 @@ class FormWebServiceAdapter(FormActionAdapter):
         try:
             from Products.DataGridField.DataGridField import DataGridField
         except ImportError:
-            print "Data Grid: Not Installed!"
             data_grid_installed = False
             class DataGridField:
                 pass
         else:
-            print "Data Grid: Installed"
             data_grid_installed = True
 
         data = OrderedDict()
@@ -277,7 +276,16 @@ class FormWebServiceAdapter(FormActionAdapter):
 
         if self.extraData:
             for field in self.extraData:
-                data[extra_data[field]] = getattr(REQUEST, field, '')
+                if field == 'USER':
+                    user = api.user.get_current()
+                    data[extra_data[field]] = user.getUserName()
+                elif field == 'REMOTE_ADDR':
+                    if 'HTTP_X_FORWARDED_FOR' in REQUEST.keys():
+                        data[extra_data[field]] = REQUEST.getHeader('HTTP_X_FORWARDED_FOR')
+                    else:
+                        data[extra_data[field]] = REQUEST.getHeader('REMOTE_ADDR')
+                else:
+                    data[extra_data[field]] = REQUEST.getHeader(field)
 
         pfg = self._getParentForm()
         submission = {
