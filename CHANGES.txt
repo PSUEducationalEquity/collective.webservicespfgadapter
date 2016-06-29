@@ -1,6 +1,15 @@
 Change History
 ==============
 
+1.2.0
+----------------
+
+- Implemented all of the extra data fields so they provide values
+- Added support for the PFGDataGridField
+- Improved support for Likert and multi-select fields
+- Increased the timeout value to 60 seconds
+
+
 1.1.0
 ----------------
 
