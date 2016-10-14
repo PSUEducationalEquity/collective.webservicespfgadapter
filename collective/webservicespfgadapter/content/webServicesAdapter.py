@@ -139,6 +139,22 @@ formWebServiceAdapterSchema = FormAdapterSchema.copy() + Schema((
                 """,
             ),
         ),
+    BooleanField('useIdsAsKeys',
+        required=0,
+        searchable=0,
+        default=False,
+        schemata='overrides',
+        write_permission=EDIT_FAILURE_SETTINGS_PERMISSION,
+        read_permission=ModifyPortalContent,
+        widget=BooleanWidget(
+            label=u'Use field IDs instead of field labels',
+            description=u"""
+                ONLY enable this option if you know what you are doing!
+                This will use the field ID (short name) values as the keys
+                in the submission dictionary instead of the field labels.
+                """,
+            ),
+        ),
 ))
 
 
@@ -217,6 +233,8 @@ class FormWebServiceAdapter(FormActionAdapter):
                 continue
             if field.isLabel() and field.portal_type == 'FieldsetStart':
                 fieldset = field.title
+                if self.useIdsAsKeys:
+                    fieldset = field.id
             elif field.isLabel() and field.portal_type == 'FieldsetEnd':
                 fieldset = ''
             if not field.isLabel():
@@ -253,39 +271,49 @@ class FormWebServiceAdapter(FormActionAdapter):
                     # something other than a string
                     val = str(val)
                 title = field.title
-                if IPloneFormGenFieldset.providedBy(field.aq_parent) \
-                and self.fieldset_separator != '':
-                    title = "%s%s%s" % (
-                        field.aq_parent.title,
-                        self.fieldset_separator,
-                        field.title
-                        )
-                elif fieldset != '' and self.fieldset_separator != '':
-                    title = "%s%s%s" % (
-                        fieldset,
-                        self.fieldset_separator,
-                        field.title
-                        )
+                if self.useIdsAsKeys:
+                    title = field.id
+                if self.fieldset_separator:
+                    if fieldset:
+                        prefix = fieldset
+                    elif IPloneFormGenFieldset.providedBy(field.aq_parent):
+                        prefix = field.aq_parent.title
+                        if self.useIdsAsKeys:
+                            prefix = field.aq_parent.id
+                    else:
+                        prefix = ''
+                    if prefix:
+                        title = "%s%s%s" % (
+                            prefix,
+                            self.fieldset_separator,
+                            title,
+                            )
                 if title in data.keys():
                     # start at 2 since the title without a number is 1
                     increment = 2
-                    while "%s %s" % (title, increment) in data.keys():
+                    pattern = "%s %s"
+                    if self.useIdsAsKeys:
+                        pattern = "%s-%s"
+                    while pattern % (title, increment) in data.keys():
                         increment += 1
-                    title = "%s %s" % (title, increment)
+                        title = pattern % (title, increment)
                 data[title] = val
 
         if self.extraData:
             for field in self.extraData:
+                key = extra_data[field]
+                if self.useIdsAsKeys:
+                    key = "extra-data-%s" % field.lower()
                 if field == 'USER':
                     user = api.user.get_current()
-                    data[extra_data[field]] = user.getUserName()
+                    data[key] = user.getUserName()
                 elif field == 'REMOTE_ADDR':
                     if 'HTTP_X_FORWARDED_FOR' in REQUEST.keys():
-                        data[extra_data[field]] = REQUEST.getHeader('HTTP_X_FORWARDED_FOR')
+                        data[key] = REQUEST.getHeader('HTTP_X_FORWARDED_FOR')
                     else:
-                        data[extra_data[field]] = REQUEST.getHeader('REMOTE_ADDR')
+                        data[key] = REQUEST.getHeader('REMOTE_ADDR')
                 else:
-                    data[extra_data[field]] = REQUEST.getHeader(field)
+                    data[key] = REQUEST.getHeader(field)
 
         pfg = self._getParentForm()
         submission = {
