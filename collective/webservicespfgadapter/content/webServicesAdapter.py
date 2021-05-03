@@ -329,6 +329,7 @@ class FormWebServiceAdapter(FormActionAdapter):
                 self.url,
                 data=submission,
                 timeout=60,
+                verify='/etc/ssl/certs/USERTrust_RSA_Certification_Authority.pem',
                 )
         except:
             raise
